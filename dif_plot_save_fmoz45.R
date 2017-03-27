@@ -5,26 +5,25 @@
 # var.name = "ELAI", "GPP", "BTRAN", "H2OSOI" ...
 # type = "abs" or "per", absolute or relative changes (%)
 # before using the function, you need to source get_geo.R and get_stat.R functions written by Amos
-library(ncdf)
-library(maps)
-library(fields)
+library(ncdf); library(maps); library(fields)
 source('/Users/mehliyarsadiq/Dropbox/Projects/ozone_vegetation/R/functions_Amos/get_geo.R')
 
 dif.plot<-function(case.name, var.name, type = "abs", zlim="fit") {
   filepath = paste("~/Dropbox/Projects/ozone_vegetation/R/data_extract/1.2.2_Aves/fmoz_clm45/", case.name, sep="")
-  # getting variable from experiment case
+  # extract variable from experiment case
   setwd(filepath)
   filename.exp = paste("fmoz_clm45_",var.name,"_",case.name,".nc", sep="")
   var.file.tmp = open.ncdf(filename.exp,write=FALSE)
   var.exp = get.var.ncdf(var.file.tmp,var.name)
   close.ncdf(var.file.tmp)
   
-  # getting variable from control case
+  # from control case
   setwd("/Users/mehliyarsadiq/Dropbox/Projects/ozone_vegetation/R/data_extract/1.2.2_Aves/fmoz_clm45/ctr")
   filename.ctr = paste("fmoz_clm45_",var.name,"_ctr.nc", sep="")
   var.file.tmp = open.ncdf(filename.ctr,write=FALSE)
   var.ctr = get.var.ncdf(var.file.tmp,var.name)
   var.long.name = att.get.ncdf(var.file.tmp, var.name,"long_name")$value
+  # get unit, lan and lon
   unit = att.get.ncdf(var.file.tmp, var.name,"units")$value
   lat = get.var.ncdf(var.file.tmp,"lat")
   lon = get.var.ncdf(var.file.tmp,"lon")
@@ -34,7 +33,7 @@ dif.plot<-function(case.name, var.name, type = "abs", zlim="fit") {
   dim_lat=dim.def.ncdf("lat","degree_north",lat)
   
   # change begin_yr and end_yr to the period you want to average over
-  # begin_yr = 3, end_yr = 5, means average over 3rd to 5th year summertime
+  # begin_yr = 3 and end_yr = 5 means average over 3rd to 5th year summertime
   begin_yr = 3
   end_yr = 5
   jja_mnths = (end_yr - begin_yr + 1) * 3  # number of summer months over the period
@@ -46,12 +45,12 @@ dif.plot<-function(case.name, var.name, type = "abs", zlim="fit") {
     j = (i-begin_yr)*3
     mnth_index[c(j+1,j+2,j+3)] = a
   }
-  # print(mnth_index)
-  # getting summertime subset of the data
+  
+  # get summertime subset of the data
   var.ctr.sum = var.ctr[,,mnth_index]
   var.exp.sum = var.exp[,,mnth_index]
   
-  # averaging over summertime
+  # average over the period
   var.ctr.mean = apply(var.ctr.sum[,,1:jja_mnths], c(1,2), mean, na.rm = TRUE)
   var.exp.mean = apply(var.exp.sum[,,1:jja_mnths], c(1,2), mean, na.rm = TRUE)
   
@@ -65,8 +64,8 @@ dif.plot<-function(case.name, var.name, type = "abs", zlim="fit") {
   elai<-get.var.ncdf(tmp,"ELAI")
   close.ncdf(tmp)
   
-  elai_ann <- apply(elai[,,], c(1,2), mean, na.rm = TRUE)
-  ind = which(elai_ann[,] < 0.01, arr.ind = T) # used later for filtering
+  elai_ann <- apply(elai[,,], c(1,2), mean, na.rm = TRUE) # annual mean
+  ind = which(elai_ann[,] < 0.01, arr.ind = T) # index used later for filtering
 
   save.path = paste("~/Dropbox/Projects/ozone_vegetation/R/data_extract/1.2.2_Aves/fmoz_clm45/plots/", case.name, sep="")
   setwd(save.path)
@@ -75,19 +74,19 @@ dif.plot<-function(case.name, var.name, type = "abs", zlim="fit") {
   {
     # calculate and plot absolute changes
     dif.var = var.exp.mean - var.ctr.mean
-    dif.var = dif.var * landmask  # get rid of ocean
-    dif.var[ind[]] = 0            # get rid of land with no significant vegetation
-    dif.var.new = dif.var[,18:92]
+    dif.var = dif.var * landmask         # get rid of ocean
+    dif.var[ind[]] = 0                   # get rid of land with no significant vegetation
+    dif.var.new = dif.var[,18:92]        # get rid of antarctica to plot
     latnew = lat[18:92]
-    name = paste(case.name,"_",var.name,"_dif.jpg", sep="")
+    name = paste(case.name,"_",var.name,"_dif.jpg", sep="") # name of the plot
     if(zlim != "fit"){
       print(name)
       jpeg(name, width=800, height=485)
-      plot.field(dif.var.new,lon,latnew,type='sign', Pacific.centric = TRUE, zlim = zlim)
+      plot.field(dif.var.new,lon,latnew,type='sign', Pacific.centric = TRUE, zlim = zlim) # read in zlim
       dev.off()
     }
     else{
-      plot.field(dif.var.new,lon,latnew,type='sign', Pacific.centric = TRUE,zlim=c(-2,2))
+      plot.field(dif.var.new,lon,latnew,type='sign', Pacific.centric = TRUE)
     }
   }
   
@@ -95,11 +94,11 @@ dif.plot<-function(case.name, var.name, type = "abs", zlim="fit") {
   {
     # calculate and plot relative changes
     dif.var = var.exp.mean - var.ctr.mean
-    var.ctr.mean[var.ctr.mean == 0] <- NA
+    var.ctr.mean[var.ctr.mean == 0] <- NA  
     dif.per = dif.var / var.ctr.mean * 100
     dif.per = dif.per * landmask  # get rid of ocean area
     dif.var[ind[]] = 0            # get rid of land with no significant vegetation
-    #dif.per = trim.quant(dif.per, 0.9)
+    #dif.per = trim.quant(dif.per, 0.9)  # further filtering of extreme values
     dif.per.new = dif.per[,18:92]
     latnew = lat[18:92]
     name = paste(case.name,"_",var.name,"_dif_per.jpg", sep="")
@@ -111,9 +110,8 @@ dif.plot<-function(case.name, var.name, type = "abs", zlim="fit") {
     }
   }
   
-  long.string = paste("Changes in",var.name)
+  long.string = paste("Changes in",var.name)  # long name in NetCDF file
   #long.string.per = paste("Percentage changes in", var.name)
-
   var=var.def.ncdf(var.name, unit, list(dim_lon,dim_lat),-1, long.string, prec="float")
   #var.per=var.def.ncdf(var.name, "%", list(dim_lon,dim_lat),-1, long.string.per, prec="float")
   
@@ -126,8 +124,9 @@ dif.plot<-function(case.name, var.name, type = "abs", zlim="fit") {
   close.ncdf(ncnew)
 }
 
-# use the function above, change the case.names below, or add case names after what it was
-# legends are chosen to be the same across analysis
+# use the function above, 
+# change the case.names below, or add case names after what it was
+# legends are chosen to be the same across differnct set of analysis
 case.names = c("dan")
 var.names = c("BTRAN", "ELAI", "H2OSOI", "LHFLX","PBLH","PRECT","RH","QBOT","QVEGT","DV_O3", "ISOP_SRF", "O3_SRF","PSN","RS")
 zlim = matrix(c(-0.1,0.1,
@@ -146,8 +145,5 @@ zlim = matrix(c(-0.1,0.1,
                 -500,500), nrow = 2, ncol = length(var.names))
 dimnames(zlim) = list(c("low", "high"), var.names)
 
-for(i in 1:length(case.names)){
-  for (j in 1: length(var.names)){
-    dif.plot(case.name = case.names[i], var.name = var.names[j], type = "abs", zlim = zlim[,var.names[j]])
-  }
-}
+for(i in 1:length(case.names))
+    for (j in 1: length(var.names)) dif.plot(case.name = case.names[i], var.name = var.names[j], type = "abs", zlim = zlim[,var.names[j]])
