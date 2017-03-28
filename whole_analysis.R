@@ -1,0 +1,28 @@
+# whole set of analysis for FMOZ+CLM4.5 simulations
+
+source("~/Dropbox/Projects/ozone_vegetation/R/data_extract/1.2.2_Aves/fmoz_clm45/code/function.R")
+
+setwd("/Users/mehliyarsadiq/Dropbox/Projects/ozone_vegetation/R/data_extract/1.2.2_Aves/fmoz_clm45/difnc")
+
+# analyze sign relationship between two given variable changes
+var.given = c("O3_SRF","DV_O3")
+# available names for var.given
+var.list = c("BTRAN", "ELAI", "H2OSOI", "LHFLX","PBLH","PRECT","RH","QBOT","QVEGT","DV_O3", "ISOP_SRF", "O3_SRF","PSN","RS")
+
+filename.tmp = paste0(var.given[1], "_dan-ctr.nc")
+file.tmp = open.ncdf(filename.tmp, write = FALSE)
+var.value1 = get.var.ncdf(file.tmp, var.given[1])
+lat = get.var.ncdf(file.tmp, "lat")
+lon = get.var.ncdf(file.tmp, "lon")
+close.ncdf(file.tmp)
+
+filename.tmp = paste0(var.given[2], "_dan-ctr.nc")
+file.tmp = open.ncdf(filename.tmp, write = FALSE)
+var.value2 = get.var.ncdf(file.tmp, var.given[2])
+close.ncdf(file.tmp)
+
+sign_harmony = two_changes_sign(var.value1, var.value2, lat, lon)
+
+
+
+
