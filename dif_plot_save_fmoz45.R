@@ -6,9 +6,9 @@
 # type = "abs" or "per", absolute or relative changes (%)
 # before using the function, you need to source get_geo.R and get_stat.R functions written by Amos
 library(ncdf); library(maps); library(fields)
-source('/Users/mehliyarsadiq/Dropbox/Projects/ozone_vegetation/R/functions_Amos/get_geo.R')
+source('~/Dropbox/Projects/ozone_vegetation/R/functions_Amos/get_geo.R')
 
-dif.plot<-function(case.name, var.name, type = "abs", zlim="fit") {
+dif.plot<-function(case.name, var.name, type = "abs", zlim="fit", begin_yr = 3, end_yr = 5) {
   filepath = paste("~/Dropbox/Projects/ozone_vegetation/R/data_extract/1.2.2_Aves/fmoz_clm45/", case.name, sep="")
   # extract variable from experiment case
   setwd(filepath)
@@ -34,8 +34,6 @@ dif.plot<-function(case.name, var.name, type = "abs", zlim="fit") {
   
   # change begin_yr and end_yr to the period you want to average over
   # begin_yr = 3 and end_yr = 5 means average over 3rd to 5th year summertime
-  begin_yr = 3
-  end_yr = 5
   jja_mnths = (end_yr - begin_yr + 1) * 3  # number of summer months over the period
   year = c(begin_yr:end_yr)
   mnth_index = rep(1, jja_mnths)
