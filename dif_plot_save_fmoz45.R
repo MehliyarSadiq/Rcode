@@ -72,7 +72,7 @@ dif.plot<-function(case.name, var.name, type = "abs", zlim="fit", begin_yr = 3, 
   {
     # calculate and plot absolute changes
     dif.var = var.exp.mean - var.ctr.mean
-    dif.var = dif.var * landmask         # get rid of ocean
+    #dif.var = dif.var * landmask         # get rid of ocean
     dif.var[ind[]] = 0                   # get rid of land with no significant vegetation
     dif.var.new = dif.var[,18:92]        # get rid of antarctica to plot
     latnew = lat[18:92]
