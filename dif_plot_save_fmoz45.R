@@ -8,7 +8,7 @@
 library(ncdf); library(maps); library(fields)
 source('~/Dropbox/Projects/ozone_vegetation/R/functions_Amos/get_geo.R')
 
-dif.plot<-function(case.name, var.name, type = "abs", zlim="fit", begin_yr = 3, end_yr = 5) {
+dif.plot<-function(case.name, var.name, type = "abs", zlim="fit", begin_yr = 6, end_yr = 10) {
   filepath = paste("~/Dropbox/Projects/ozone_vegetation/R/data_extract/1.2.2_Aves/fmoz_clm45/", case.name, sep="")
   # extract variable from experiment case
   setwd(filepath)
