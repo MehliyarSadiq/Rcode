@@ -1,8 +1,6 @@
 # combine sunlit and shaded variables together
 # from default 2-d output
-library(ncdf)
-library(maps)
-library(fields)
+library(ncdf); library(maps); library(fields)
 source('/Users/mehliyarsadiq/Dropbox/Projects/ozone_vegetation/R/functions_Amos/get_geo.R')
 
 combine<-function(case.name) {
