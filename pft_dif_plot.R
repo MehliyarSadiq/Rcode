@@ -2,6 +2,7 @@
 
 library(ncdf); library(maps); library(fields)
 source('~/Dropbox/Projects/ozone_vegetation/R/functions_Amos/get_geo.R')
+source('~/Dropbox/Projects/ozone_vegetation/R/functions_Amos/get_stat.R')
 
 pft_plot = function(case.name="dan", var.name, zlim="fit")
 {
@@ -43,7 +44,7 @@ pft_plot = function(case.name="dan", var.name, zlim="fit")
   elai_ann <- apply(elai[,,], c(1,2), mean, na.rm = TRUE) # annual mean
   ind = which(elai_ann[,] < 0.01, arr.ind = T) # index used later for filtering
   
-  save.path = paste("~/Dropbox/Projects/ozone_vegetation/R/data_extract/1.2.2_Aves/fmoz_clm45/plots/pft/", case.name, sep="")
+  save.path = paste0("~/Dropbox/Projects/ozone_vegetation/R/data_extract/1.2.2_Aves/fmoz_clm45/plots/pft/",case.name,"/",var.name)
   setwd(save.path)
   
   #if(type == "abs")
@@ -67,12 +68,47 @@ pft_plot = function(case.name="dan", var.name, zlim="fit")
     }
   }
   #}
+  if(var.name == "RSSUN"||var.name == "RSSHA")
+  {
+    setwd("/Users/mehliyarsadiq/Dropbox/Projects/ozone_vegetation/R/data_extract/1.2.2_Aves/fmoz_clm45/ctr/pft")
+    filename.ctr = paste("fmoz_clm45_",var.name,".nc", sep="")
+    file.tmp = open.ncdf(filename.ctr,write=FALSE)
+    pftwt = get.var.ncdf(file.tmp,"pft_wtgcell")
+    
+    tmp = 1/var.ctr.sum
+    tmp = tmp*pftwt[,,7,]
+    var.ctr.com = apply(tmp[,,], c(1,2), sum, na.rm = TRUE)
+    var.ctr.com = 1/var.ctr.com
+    
+    tmp = 1/var.exp.sum
+    tmp = tmp*pftwt[,,7,]
+    var.exp.com = apply(tmp[,,], c(1,2), sum, na.rm = TRUE)
+    var.exp.com = 1/var.exp.com
+    
+    var.dif.com = var.exp.com - var.ctr.com
+    var.dif.new = var.dif.com[,18:92]
+    var.dif.new = trim.quant(var.dif.new, 0.95)
+    
+    save.path = paste0("~/Dropbox/Projects/ozone_vegetation/R/data_extract/1.2.2_Aves/fmoz_clm45/plots/pft/", case.name, "/combined/")
+    setwd(save.path)
+    
+    name = paste(case.name,"_",var.name,"_pft_com_dif.jpg", sep="") # name of the plot
+    if(zlim != "fit"){
+      print(name)
+      jpeg(name, width=800, height=485)
+      plot.field(var.dif.new,lon,latnew,type='sign', Pacific.centric = TRUE, zlim = zlim) # read in zlim
+      dev.off()
+    }
+    else{
+      plot.field(var.dif.new,lon,latnew,type='sign', Pacific.centric = TRUE)
+    }
+  }
 }
 
 var.names = c("ELAI", "RSSUN", "RSSHA")
 zlim = matrix(c(-2,2,
-                -500,500,
-                -500,500), nrow = 2, ncol = length(var.names))
+                -300,300,
+                -300,300), nrow = 2, ncol = length(var.names))
 dimnames(zlim) = list(c("low", "high"), var.names)
 
 for(i in 1:length(case.names))
