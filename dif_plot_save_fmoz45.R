@@ -126,8 +126,9 @@ dif.plot<-function(case.name, var.name, type = "abs", zlim="fit", begin_yr = 6, 
 # change the case.names below, or add case names after what it was
 # legends are chosen to be the same across differnct set of analysis
 case.names = c("dan")
-var.names = c("TS", "BTRAN", "ELAI", "H2OSOI", "LHFLX","PBLH","PRECT","RH","QBOT","QVEGT","DV_O3", "ISOP_SRF", "O3_SRF","PSN","RS", "RSSUN", "RSSHA", "PSNSUN", "PSNSHA")
+var.names = c("TV","TS", "BTRAN", "ELAI", "H2OSOI", "LHFLX","PBLH","PRECT","RH","QBOT","QVEGT","DV_O3", "ISOP_SRF", "O3_SRF","PSN","RS", "RSSUN", "RSSHA", "PSNSUN", "PSNSHA", "MEG_ISOP")
 zlim = matrix(c(-3,3,
+                -3,3,
                 -0.1,0.1,
                 -2,2,
                 -0.3,0.3,
@@ -141,7 +142,12 @@ zlim = matrix(c(-3,3,
                 -2e-10,2e-10,
                 -6e-9,6e-9,
                 -1,1,
-                -500,500), nrow = 2, ncol = length(var.names))
+                -500,500,
+                -500,500,
+                -500,500,
+                -1,1,
+                -1,1,
+                -1e-11,1e-11), nrow = 2, ncol = length(var.names))
 dimnames(zlim) = list(c("low", "high"), var.names)
 
 for(i in 1:length(case.names))
