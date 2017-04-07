@@ -1,29 +1,28 @@
-# FMOZ + CLM4.5
+# for analysing FMOZ + CLM4.5 outputs
 # Compare two cases (CTR and one of the experiment cases: pht, cond or dan(pht + cond))
-# argument of the function 'case.name' = "dan", "cond" or "pht"
-# Plot the changes in a spefic variable (e.g. ELAI), in capital letters
+# Argument: 'case.name' = "dan", "cond" or "pht"
+# Plot the changes in a spefic variable (var.name, e.g. ELAI), in capital letters
 # var.name = "ELAI", "GPP", "BTRAN", "H2OSOI" ...
 # type = "abs" or "per", absolute or relative changes (%)
-# before using the function, you need to source get_geo.R and get_stat.R functions written by Amos
+# before using the function, you need to source get_geo.R and get_stat.R functions written by Amos P.K. Tai
 library(ncdf); library(maps); library(fields)
 source('~/Dropbox/Projects/ozone_vegetation/R/functions_Amos/get_geo.R')
 
 dif.plot<-function(case.name, var.name, type = "abs", zlim="fit", begin_yr = 6, end_yr = 10) {
   filepath = paste("~/Dropbox/Projects/ozone_vegetation/R/data_extract/1.2.2_Aves/fmoz_clm45/", case.name, sep="")
-  # extract variable from experiment case
+  # read in variable from experiment case
   setwd(filepath)
   filename.exp = paste("fmoz_clm45_",var.name,"_",case.name,".nc", sep="")
   var.file.tmp = open.ncdf(filename.exp,write=FALSE)
   var.exp = get.var.ncdf(var.file.tmp,var.name)
   close.ncdf(var.file.tmp)
-  
-  # from control case
+  # read in from control case
   setwd("/Users/mehliyarsadiq/Dropbox/Projects/ozone_vegetation/R/data_extract/1.2.2_Aves/fmoz_clm45/ctr")
   filename.ctr = paste("fmoz_clm45_",var.name,"_ctr.nc", sep="")
   var.file.tmp = open.ncdf(filename.ctr,write=FALSE)
   var.ctr = get.var.ncdf(var.file.tmp,var.name)
   var.long.name = att.get.ncdf(var.file.tmp, var.name,"long_name")$value
-  # get unit, lan and lon
+  # get unit, lan and lon attributes
   unit = att.get.ncdf(var.file.tmp, var.name,"units")$value
   lat = get.var.ncdf(var.file.tmp,"lat")
   lon = get.var.ncdf(var.file.tmp,"lon")
@@ -33,9 +32,10 @@ dif.plot<-function(case.name, var.name, type = "abs", zlim="fit", begin_yr = 6, 
   dim_lat=dim.def.ncdf("lat","degree_north",lat)
   
   # change begin_yr and end_yr to the period you want to average over
-  # begin_yr = 3 and end_yr = 5 means average over 3rd to 5th year summertime
+  # begin_yr = 3 and end_yr = 5 means average over 3rd (2003) to 5th (2005) year summertime
   jja_mnths = (end_yr - begin_yr + 1) * 3  # number of summer months over the period
   year = c(begin_yr:end_yr)
+  # get index of the summertime months
   mnth_index = rep(1, jja_mnths)
   for (i in year)
   {
@@ -64,7 +64,7 @@ dif.plot<-function(case.name, var.name, type = "abs", zlim="fit", begin_yr = 6, 
   
   elai_ann <- apply(elai[,,], c(1,2), mean, na.rm = TRUE) # annual mean
   ind = which(elai_ann[,] < 0.01, arr.ind = T) # index used later for filtering
-
+  # where to store the plots
   save.path = paste("~/Dropbox/Projects/ozone_vegetation/R/data_extract/1.2.2_Aves/fmoz_clm45/plots/", case.name, sep="")
   setwd(save.path)
   
@@ -73,10 +73,11 @@ dif.plot<-function(case.name, var.name, type = "abs", zlim="fit", begin_yr = 6, 
     # calculate and plot absolute changes
     dif.var = var.exp.mean - var.ctr.mean
     dif.var = dif.var * landmask         # get rid of ocean
-    dif.var[ind[]] = 0                   # get rid of land with no significant vegetation
-    dif.var.new = dif.var[,18:92]        # get rid of antarctica to plot
+    dif.var[ind[]] = 0                   # get rid of land with no significant vegetation, annual mean ELAI < 0.01
+    dif.var.new = dif.var[,18:92]        # get rid of antarctica for plotting
     latnew = lat[18:92]
     name = paste(case.name,"_",var.name,"_dif.jpg", sep="") # name of the plot
+    # zlim could be preset and passed for inter-simulation comparisons
     if(zlim != "fit"){
       print(name)
       jpeg(name, width=800, height=485)
@@ -92,11 +93,11 @@ dif.plot<-function(case.name, var.name, type = "abs", zlim="fit", begin_yr = 6, 
   {
     # calculate and plot relative changes
     dif.var = var.exp.mean - var.ctr.mean
-    var.ctr.mean[var.ctr.mean == 0] <- NA  
+    var.ctr.mean[var.ctr.mean == 0] <- NA  # set zeros to NA before dividing
     dif.per = dif.var / var.ctr.mean * 100
-    dif.per = dif.per * landmask  # get rid of ocean area
-    dif.var[ind[]] = 0            # get rid of land with no significant vegetation
-    #dif.per = trim.quant(dif.per, 0.9)  # further filtering of extreme values
+    dif.per = dif.per * landmask           # get rid of ocean area
+    dif.var[ind[]] = 0                     # get rid of land with no significant vegetation
+    #dif.per = trim.quant(dif.per, 0.9)    # further filtering of extreme values
     dif.per.new = dif.per[,18:92]
     latnew = lat[18:92]
     name = paste(case.name,"_",var.name,"_dif_per.jpg", sep="")
@@ -107,7 +108,7 @@ dif.plot<-function(case.name, var.name, type = "abs", zlim="fit", begin_yr = 6, 
       dev.off()
     }
   }
-  
+  # define attributes to store the difference data in NC files
   long.string = paste("Changes in",var.name)  # long name in NetCDF file
   #long.string.per = paste("Percentage changes in", var.name)
   var=var.def.ncdf(var.name, unit, list(dim_lon,dim_lat),-1, long.string, prec="float")
@@ -122,10 +123,10 @@ dif.plot<-function(case.name, var.name, type = "abs", zlim="fit", begin_yr = 6, 
   close.ncdf(ncnew)
 }
 
-# use the function above, 
+# use the function with the following code 
 # change the case.names below, or add case names after what it was
-# legends are chosen to be the same across differnct set of analysis
-case.names = c("dan")
+# legends are chosen to be the same across differnct sets of analysis
+case.names = c("dan") # only dan (cond+pht) is available now
 var.names = c("TV","TS", "BTRAN", "ELAI", "H2OSOI", "LHFLX","PBLH","PRECT","RH","QBOT","QVEGT","DV_O3", "ISOP_SRF", "O3_SRF","PSN","RS", "RSSUN", "RSSHA", "PSNSUN", "PSNSHA", "MEG_ISOP")
 zlim = matrix(c(-3,3,
                 -3,3,
