@@ -1,5 +1,5 @@
 # compare PFT-level outputs and plot the differences
-
+# combine stomatal resistance terms of all PFTs
 library(ncdf); library(maps); library(fields)
 source('~/Dropbox/Projects/ozone_vegetation/R/functions_Amos/get_geo.R')
 source('~/Dropbox/Projects/ozone_vegetation/R/functions_Amos/get_stat.R')
@@ -7,7 +7,7 @@ source('~/Dropbox/Projects/ozone_vegetation/R/functions_Amos/get_stat.R')
 pft_plot = function(case.name="dan", var.name, zlim="fit")
 {
   filepath = paste0("~/Dropbox/Projects/ozone_vegetation/R/data_extract/1.2.2_Aves/fmoz_clm45/", case.name, "/pft/")
-  # extract variable from experiment case
+  # read in variable from experiment case
   setwd(filepath)
   filename.exp = paste0("fmoz_clm45_",var.name,"_",case.name,".nc")
   var.file.tmp = open.ncdf(filename.exp,write=FALSE)
@@ -49,6 +49,7 @@ pft_plot = function(case.name="dan", var.name, zlim="fit")
   
   #if(type == "abs")
   #{
+  # loop over different PFTs and calculate changes + plot
   for(iveg in 1:16)
   {
     # calculate and plot absolute changes
@@ -68,6 +69,7 @@ pft_plot = function(case.name="dan", var.name, zlim="fit")
     }
   }
   #}
+  # combine all of PFT values for stomatal resistance
   if(var.name == "RSSUN"||var.name == "RSSHA")
   {
     setwd("/Users/mehliyarsadiq/Dropbox/Projects/ozone_vegetation/R/data_extract/1.2.2_Aves/fmoz_clm45/ctr/pft")
@@ -76,7 +78,7 @@ pft_plot = function(case.name="dan", var.name, zlim="fit")
     pftwt = get.var.ncdf(file.tmp,"pft_wtgcell")
     
     tmp = 1/var.ctr.sum
-    tmp = tmp*pftwt[,,7,]
+    tmp = tmp*pftwt[,,7,] # used July for now!!! change it later!
     var.ctr.com = apply(tmp[,,], c(1,2), sum, na.rm = TRUE)
     var.ctr.com = 1/var.ctr.com
     
@@ -104,7 +106,7 @@ pft_plot = function(case.name="dan", var.name, zlim="fit")
     }
   }
 }
-
+# use the function above
 var.names = c("ELAI", "RSSUN", "RSSHA")
 zlim = matrix(c(-2,2,
                 -300,300,
