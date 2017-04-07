@@ -1,8 +1,10 @@
-# read in two maps with changes
+# read in two maps of changes
 # type = "pisitive" / "negative"
-# lat and lon for plotting
-# if the changes have positive relationship, find the changes positively related and output 1, vise versa
+# pass lat and lon for plotting
+# if the two changes have positive relationship, find the places that are positively related and output 1, vise versa
+
 source("~/Dropbox/Projects/ozone_vegetation/R/functions_Amos/get_geo.R")
+
 two_changes_sign = function(var1, var2, type, lat, lon)
 {
   result = array(NaN, dim(var1))
