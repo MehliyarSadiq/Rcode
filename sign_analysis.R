@@ -1,7 +1,25 @@
-# whole set of analysis for FMOZ+CLM4.5 simulations
-# source the function I wrote
-source("~/Dropbox/Projects/ozone_vegetation/R/data_extract/1.2.2_Aves/fmoz_clm45/code/function.R")
+# following function reads in two maps (presumably changes in two variables, LAI and DryDepVel for example)
+# it also needs 'lat' and 'lon' attributes of the map 
+# type = "pisitive" / "negative", this specifies the theoratical relationship between these two changes, e.g. higher LAI leads to higher DV
+# if the two changes have positive relationship, find the places that have the same sign and output 1, vise versa
+source("~/Dropbox/Projects/ozone_vegetation/R/functions_Amos/get_geo.R")
 
+two_changes_sign = function(var1, var2, type, lat, lon)
+{
+  result = array(NaN, dim(var1))
+  multi = var1 * var2
+  if(type == "positive"){
+    indx = which(multi > 0, arr.ind = TRUE)
+    result[indx] = 1
+  }
+  if(type == "negative"){
+    indx = which(multi < 0, arr.ind = TRUE)
+    result[indx] = -1
+  }
+  plot.field(result, lon, lat, type = "sign", zlim = c(-2,2), Pacific.centric = TRUE)
+}
+
+# start the analysis
 setwd("/Users/mehliyarsadiq/Dropbox/Projects/ozone_vegetation/R/data_extract/1.2.2_Aves/fmoz_clm45/difnc")
 
 # analyze sign relationship between two given variable changes
@@ -33,7 +51,3 @@ var.value2 = get.var.ncdf(file.tmp, var.given[2])
 close.ncdf(file.tmp)
 # use the function
 sign_harmony = two_changes_sign(var.value1, var.value2, type=var.given[3], lat, lon)
-
-
-
-
