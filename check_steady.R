@@ -14,18 +14,31 @@ steady_check = function(var.name, case.name)
   # for EU, I picked Frankfurt, lat = 50, lon = 8.7, indices are [5,75]
   # for US, I picked middle of West Virginia, lat = 38, lon = -80, indices are [113,70]
   # do the time series plots for all of them
-  xmonth = c(1:length(var[1,1,])) # x axis
-  # China
-  mean_cn = apply(var[45:47,61:63,], 3, mean, na.rm = TRUE) # average over 9 grids
-  plot(xmonth, mean_cn, type = 'l')
-  #plot(xmonth, var[46,62,], type = 'l') # exact spot
+  save.path = paste0("~/Dropbox/Projects/ozone_vegetation/R/data_extract/1.2.2_Aves/fmoz_clm45/plots/ts/", case.name)
+  setwd(save.path)                                       # change path to save plots
+  month = c(1:length(var[1,1,]))                         # x axis
+  name = paste0(case.name, "_", var.name, "_TS.jpeg")    # name of the plot to be saved
+  jpeg(name, width=800, height=485)                      # parameters of the figure
+  par(mfrow=c(3,1))                                      # structure of panel, 3 rows 1 column
+  # China, average over 9 grids containing the picked spot as the center
+  mean_China = apply(var[45:47,61:63,], 3, mean, na.rm = TRUE)
+  title = paste(var.name, "vs. Time")                    # title of the whole panel
+  plot(month, mean_China, type = 'l', main = title)
+  # plot(month, var[46,62,], type = 'l')                 # exact location picked
   # EU
-  mean_eu = apply(var[4:6,74:76,], 3, mean, na.rm = TRUE)
-  plot(xmonth, mean_eu, type = 'l')
-  #plot(xmonth, var[5,75,], type = 'l')
+  mean_Europe = apply(var[4:6,74:76,], 3, mean, na.rm = TRUE)
+  plot(month, mean_Europe, type = 'l')
+  # plot(month, var[5,75,], type = 'l')
   # US
-  mean_us = apply(var[112:114,69:71,], 3, mean, na.rm = TRUE)
-  plot(xmonth, mean_us, type = 'l')
-  #plot(xmonth, var[113,70,], type = 'l')
+  mean_US = apply(var[112:114,69:71,], 3, mean, na.rm = TRUE)
+  plot(month, mean_US, type = 'l')
+  # plot(month, var[113,70,], type = 'l')
+  dev.off()                                              # end the plotting and saving
 }
-steady_check(var.name = "ELAI", case.name = "dan")
+
+# use the function above for different cases and variables
+case.names = c("ctr", "dan")
+var.names = c("TV","TS", "BTRAN", "ELAI", "H2OSOI", "LHFLX","PBLH","PRECT","RH","QBOT","QVEGT","DV_O3", "ISOP_SRF", "O3_SRF","PSN","RS", "RSSUN", "RSSHA", "PSNSUN", "PSNSHA", "MEG_ISOP")
+for(i in 1:length(case.names))
+  for (j in 1: length(var.names)) steady_check(var.name = var.names[j], case.name = case.names[i])
+
