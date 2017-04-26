@@ -17,7 +17,7 @@ pft_plot = function(case.name="dan", var.name, zlim="fit")
   
   # from control case
   setwd("/Users/mehliyarsadiq/Dropbox/Projects/ozone_vegetation/R/data_extract/1.2.2_Aves/fmoz_clm45/ctr/pft")
-  filename.ctr = paste("fmoz_clm45_",var.name,".nc", sep="")
+  filename.ctr = paste0("fmoz_clm45_",var.name,".nc")
   var.file.tmp = open.ncdf(filename.ctr,write=FALSE)
   var.ctr.new = paste0(var.name,"_pft")
   var.ctr = get.var.ncdf(var.file.tmp,var.ctr.new)
@@ -57,7 +57,7 @@ pft_plot = function(case.name="dan", var.name, zlim="fit")
     dif.var[ind[]] = 0                   # get rid of land with no significant vegetation
     dif.var.new = dif.var[,18:92]        # get rid of antarctica to plot
     latnew = lat[18:92]
-    name = paste(case.name,"_",var.name,"_pft", iveg, "_dif.jpg", sep="") # name of the plot
+    name = paste0(case.name,"_",var.name,"_pft", iveg, "_dif.jpg") # name of the plot
     if(zlim != "fit"){
       print(name)
       jpeg(name, width=800, height=485)
@@ -73,7 +73,7 @@ pft_plot = function(case.name="dan", var.name, zlim="fit")
   if(var.name == "RSSUN"||var.name == "RSSHA")
   {
     setwd("/Users/mehliyarsadiq/Dropbox/Projects/ozone_vegetation/R/data_extract/1.2.2_Aves/fmoz_clm45/ctr/pft")
-    filename.ctr = paste("fmoz_clm45_",var.name,".nc", sep="")
+    filename.ctr = paste0("fmoz_clm45_",var.name,".nc")
     file.tmp = open.ncdf(filename.ctr,write=FALSE)
     pftwt = get.var.ncdf(file.tmp,"pft_wtgcell")
     
@@ -94,7 +94,7 @@ pft_plot = function(case.name="dan", var.name, zlim="fit")
     save.path = paste0("~/Dropbox/Projects/ozone_vegetation/R/data_extract/1.2.2_Aves/fmoz_clm45/plots/pft/", case.name, "/combined/")
     setwd(save.path)
     
-    name = paste(case.name,"_",var.name,"_pft_com_dif.jpg", sep="") # name of the plot
+    name = paste0(case.name,"_",var.name,"_pft_com_dif.jpg") # name of the plot
     if(zlim != "fit"){
       print(name)
       jpeg(name, width=800, height=485)
