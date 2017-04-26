@@ -1,4 +1,5 @@
-# following function reads in a variable from a simulation, and plot a time series fluctuation in different regions (US, EU and China)
+# steady_check reads in a variable from a simulation, and plot time series for hand-picked spots in different regions (US, EU and China)
+library(ncdf)
 steady_check = function(var.name, case.name)
 {
   filepath = paste0("~/Dropbox/Projects/ozone_vegetation/R/data_extract/1.2.2_Aves/fmoz_clm45/", case.name)
