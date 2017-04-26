@@ -147,7 +147,7 @@ zlim = matrix(c(-3,3,
                 -500,500,
                 -500,500,
                 -1,1,
-                -1,1,
+                -0.5,0.5,
                 -1e-11,1e-11), nrow = 2, ncol = length(var.names))
 dimnames(zlim) = list(c("low", "high"), var.names)
 
