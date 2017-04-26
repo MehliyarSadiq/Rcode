@@ -9,16 +9,16 @@ library(ncdf); library(maps); library(fields)
 source('~/Dropbox/Projects/ozone_vegetation/R/functions_Amos/get_geo.R')
 
 dif.plot<-function(case.name, var.name, type = "abs", zlim="fit", begin_yr = 6, end_yr = 10) {
-  filepath = paste("~/Dropbox/Projects/ozone_vegetation/R/data_extract/1.2.2_Aves/fmoz_clm45/", case.name, sep="")
+  filepath = paste0("~/Dropbox/Projects/ozone_vegetation/R/data_extract/1.2.2_Aves/fmoz_clm45/", case.name)
   # read in variable from experiment case
   setwd(filepath)
-  filename.exp = paste("fmoz_clm45_",var.name,"_",case.name,".nc", sep="")
+  filename.exp = paste0("fmoz_clm45_",var.name,"_",case.name,".nc")
   var.file.tmp = open.ncdf(filename.exp,write=FALSE)
   var.exp = get.var.ncdf(var.file.tmp,var.name)
   close.ncdf(var.file.tmp)
   # read in from control case
   setwd("/Users/mehliyarsadiq/Dropbox/Projects/ozone_vegetation/R/data_extract/1.2.2_Aves/fmoz_clm45/ctr")
-  filename.ctr = paste("fmoz_clm45_",var.name,"_ctr.nc", sep="")
+  filename.ctr = paste0("fmoz_clm45_",var.name,"_ctr.nc")
   var.file.tmp = open.ncdf(filename.ctr,write=FALSE)
   var.ctr = get.var.ncdf(var.file.tmp,var.name)
   var.long.name = att.get.ncdf(var.file.tmp, var.name,"long_name")$value
@@ -65,7 +65,7 @@ dif.plot<-function(case.name, var.name, type = "abs", zlim="fit", begin_yr = 6, 
   elai_ann <- apply(elai[,,], c(1,2), mean, na.rm = TRUE) # annual mean
   ind = which(elai_ann[,] < 0.01, arr.ind = T) # index used later for filtering
   # where to store the plots
-  save.path = paste("~/Dropbox/Projects/ozone_vegetation/R/data_extract/1.2.2_Aves/fmoz_clm45/plots/", case.name, sep="")
+  save.path = paste0("~/Dropbox/Projects/ozone_vegetation/R/data_extract/1.2.2_Aves/fmoz_clm45/plots/", case.name)
   setwd(save.path)
   
   if(type == "abs")
@@ -76,7 +76,7 @@ dif.plot<-function(case.name, var.name, type = "abs", zlim="fit", begin_yr = 6, 
     dif.var[ind[]] = 0                   # get rid of land with no significant vegetation, annual mean ELAI < 0.01
     dif.var.new = dif.var[,18:92]        # get rid of antarctica for plotting
     latnew = lat[18:92]
-    name = paste(case.name,"_",var.name,"_dif.jpg", sep="") # name of the plot
+    name = paste0(case.name,"_",var.name,"_dif.jpg") # name of the plot
     # zlim could be preset and passed for inter-simulation comparisons
     if(zlim != "fit"){
       print(name)
@@ -100,7 +100,7 @@ dif.plot<-function(case.name, var.name, type = "abs", zlim="fit", begin_yr = 6, 
     #dif.per = trim.quant(dif.per, 0.9)    # further filtering of extreme values
     dif.per.new = dif.per[,18:92]
     latnew = lat[18:92]
-    name = paste(case.name,"_",var.name,"_dif_per.jpg", sep="")
+    name = paste0(case.name,"_",var.name,"_dif_per.jpg")
     if(zlim != "fit")
     {
       jpeg(name, width=800, height=485)
@@ -116,7 +116,7 @@ dif.plot<-function(case.name, var.name, type = "abs", zlim="fit", begin_yr = 6, 
   
   # save the differences in NetCDF format
   setwd("/Users/mehliyarsadiq/Dropbox/Projects/ozone_vegetation/R/data_extract/1.2.2_Aves/fmoz_clm45/difnc")
-  file.name.tmp = paste(var.name,"_",case.name,"-ctr.nc", sep="")
+  file.name.tmp = paste0(var.name,"_",case.name,"-ctr.nc")
   ncnew=create.ncdf(file.name.tmp,var)
   put.var.ncdf(ncnew,var,dif.var)
   #put.var.ncdf(ncnew,var.per,dif.per)
