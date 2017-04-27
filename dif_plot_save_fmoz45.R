@@ -8,11 +8,11 @@
 library(ncdf); library(maps); library(fields)
 source('~/Dropbox/Projects/ozone_vegetation/R/functions_Amos/get_geo.R')
 
-dif.plot<-function(case.name, var.name, type = "abs", zlim="fit", begin_yr = 6, end_yr = 10) {
+dif.plot = function(case.name, var.name, type = "abs", zlim="fit", begin_yr = 6, end_yr = 10) {
   filepath = paste0("~/Dropbox/Projects/ozone_vegetation/R/data_extract/1.2.2_Aves/fmoz_clm45/", case.name)
-  # read in variable from experiment case
   setwd(filepath)
-  filename.exp = paste0("fmoz_clm45_",var.name,"_",case.name,".nc")
+  # read in variable from experiment case
+  filename.exp = paste0("fmoz_clm45_",var.name,"_",case.name,".nc") # these files are after extraction
   var.file.tmp = open.ncdf(filename.exp,write=FALSE)
   var.exp = get.var.ncdf(var.file.tmp,var.name)
   close.ncdf(var.file.tmp)
