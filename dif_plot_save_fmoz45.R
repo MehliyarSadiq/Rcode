@@ -115,12 +115,18 @@ dif.plot = function(case.name, var.name, type = "abs", zlim="fit", begin_yr = 6,
   #var.per=var.def.ncdf(var.name, "%", list(dim_lon,dim_lat),-1, long.string.per, prec="float")
   
   # save the differences in NetCDF format
-  setwd("/Users/mehliyarsadiq/Dropbox/Projects/ozone_vegetation/R/data_extract/1.2.2_Aves/fmoz_clm45/difnc")
+  setwd("/Users/mehliyarsadiq/Dropbox/Projects/ozone_vegetation/R/data_extract/1.2.2_Aves/fmoz_clm45/dif/NetCDF")
   file.name.tmp = paste0(var.name,"_",case.name,"-ctr.nc")
   ncnew=create.ncdf(file.name.tmp,var)
   put.var.ncdf(ncnew,var,dif.var)
   #put.var.ncdf(ncnew,var.per,dif.per)
   close.ncdf(ncnew)
+  
+  # save the differences in R data format
+  setwd("/Users/mehliyarsadiq/Dropbox/Projects/ozone_vegetation/R/data_extract/1.2.2_Aves/fmoz_clm45/dif/Rdata")
+  name.tmp = paste0(var.name,"_",case.name,"-ctr.RData")
+  description = paste0(var.name, "_", case.name, "-ctr")
+  save(lat, lon, dif.var, description, file = name.tmp)
 }
 
 # use the function with the following code 
